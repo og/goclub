@@ -53,6 +53,5 @@ func (v ReqUpdateTopicCoverPhoto) VD(r *vd.Rule) {
 	r.String(v.TopicID.String(), vd.StringSpec{})
 	r.String(v.CoverPhoto, vd.StringSpec{
 		Name: "封面图片",
-		AllowEmpty: true,
 	})
 }
