@@ -1,9 +1,7 @@
-package responseUtil
+package respU
 import "github.com/og/x/error"
-type Util struct {
 
-}
-func (Util) Reject(msg string, shouldRecord bool) error {
+func Reject(msg string, shouldRecord bool) error {
 	return ge.NewReject(Response{
 		Type: Response{}.Type.Enum().Fail,
 		Msg: msg,

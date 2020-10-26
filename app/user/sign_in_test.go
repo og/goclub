@@ -1,6 +1,8 @@
 package userSerive
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestService_SignIn(t *testing.T) {
 
