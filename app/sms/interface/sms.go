@@ -1,6 +1,7 @@
 package ISmsService
 
 import (
+	"errors"
 	ISmsDataStorage "github.com/og/goclub/app/sms/data_storage/interface"
 	vd "github.com/og/juice/validator"
 )
@@ -11,7 +12,7 @@ type Interface interface {
 }
 
 type ReqSendAuthCode struct {
-	Kind ReqVerifyAuthCodeKind
+	Kind AuthCodeKind
 	Mobile string
 }
 
@@ -23,23 +24,44 @@ func (v ReqSendAuthCode) VD(r *vd.Rule) {
 	})
 }
 type ReqVerifyAuthCode struct {
-	Kind ReqVerifyAuthCodeKind
+	Kind AuthCodeKind
 	Mobile string
 	AuthCode string
 }
-type ReqVerifyAuthCodeKind string
-
-func (v ReqVerifyAuthCodeKind) String() string {
+type AuthCodeKind string
+func NewAuthCodeKind(s string) AuthCodeKind {
+	return AuthCodeKind(s)
+}
+func (v AuthCodeKind) String() string {
 	return string(v)
 }
-func (ReqVerifyAuthCodeKind) Enum() (e struct{
-	Login ReqVerifyAuthCodeKind
-	SignIn ReqVerifyAuthCodeKind
+func (AuthCodeKind) Enum() (e struct{
+	Login AuthCodeKind
+	SignIn AuthCodeKind
 }) {
 	e.Login = "login"
 	e.SignIn = "signIn"
 	return
 }
-func (kind ReqVerifyAuthCodeKind) AuthDataKind () ISmsDataStorage.AuthCodeKind {
-	return ISmsDataStorage.NewAuthCodeKind(kind.String())
+func (v AuthCodeKind) Switch(
+	Login func(_login int),
+	SignIn func(_signIn bool),
+	) {
+	enum := v.Enum()
+	switch v {
+	default:
+		panic(errors.New("AuthCodeKind kind error"))
+	case enum.Login:
+		Login(0)
+	case enum.SignIn:
+		SignIn(false)
+	}
+}
+func (v AuthCodeKind) SmsDataStorageAuthCodeKind() (kind ISmsDataStorage.AuthCodeKind) {
+	v.Switch(func(_login int) {
+		kind = kind.Enum().Login
+	}, func(_signIn bool) {
+		kind = kind.Enum().SignIn
+	})
+	return
 }

@@ -8,8 +8,8 @@ import (
 const verifySignInAuthCodeFailLimit = 10
 func (dep Service) VerifySignInAuthCode(req ISmsService.ReqVerifyAuthCode) (reject error) {
 	authData := ISmsDataStorage.AuthCodeData{
+		Kind: ISmsDataStorage.AuthCodeKind(req.Kind.String()),
 		Mobile: req.Mobile,
-		Kind: req.Kind.AuthDataKind(),
 	}
 	authCode, hasAuthCode, reject := dep.smsDS.AuthCode(authData) ; if reject != nil {return}
 	if hasAuthCode {

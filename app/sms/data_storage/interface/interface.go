@@ -1,26 +1,27 @@
 package ISmsDataStorage
 
-import vd "github.com/og/juice/validator"
+import (
+	"errors"
+)
 
 type Interface interface {
+	CreateAuthCodeRecord(record CreateAuthCodeRecord) (reject error)
 	AuthCode(authData AuthCodeData)(authCode string, hasAuthCode bool, reject error)
 	DeleteAuthCode(authData AuthCodeData) (reject error)
 	AuthCodeVerifyFailCount(authData AuthCodeData) (failCount uint,reject error)
 	IncrAuthCodeVerifyFailCount(authData AuthCodeData) (reject error)
 	ResetAuthCodeVerifyFailCount(authData AuthCodeData) (reject error)
 }
+type CreateAuthCodeRecord struct {
+	Kind AuthCodeKind
+	Mobile string
+	AuthCode string
+}
 type AuthCodeData struct {
 	Kind AuthCodeKind
 	Mobile string
 }
-func (v AuthCodeData) VD(r *vd.Rule) {
-	r.String(v.Mobile, vd.StringSpec{Name:"手机号", Ext: []vd.StringSpec{vd.ChinaMobile()}})
-	r.String(v.Kind.String(), vd.StringSpec{Name:"类型", Enum: vd.EnumValues(v.Kind.Enum())})
-}
 type AuthCodeKind string
-func NewAuthCodeKind (s string) AuthCodeKind {
-	return AuthCodeKind(s)
-}
 func (v AuthCodeKind) String() string {
 	return string(v)
 }
@@ -31,4 +32,18 @@ func (AuthCodeKind) Enum() (e struct{
 	e.Login = "login"
 	e.SignIn = "signIn"
 	return
+}
+func (v AuthCodeKind) Switch(
+	Login func(_login int),
+	SignIn func(_signIn bool),
+	) {
+	enum := v.Enum()
+	switch v {
+	default:
+		panic(errors.New("AuthCodeKind value error"))
+	case enum.Login:
+		Login(0)
+	case enum.SignIn:
+		SignIn(false)
+	}
 }

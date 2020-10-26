@@ -1,6 +1,7 @@
 package userSerive
 
 import (
+	m "github.com/og/goclub/app/model"
 	ISmsService "github.com/og/goclub/app/sms/interface"
 	IUserDataStorage "github.com/og/goclub/app/user/data_storage/interface"
 	IUserService "github.com/og/goclub/app/user/interface"
@@ -19,11 +20,12 @@ func (dep Service) SignIn(req IUserService.ReqSignIn)(reply IUserService.ReplySi
 		return
 	}
 	reject = dep.smsS.VerifyAuthCode(ISmsService.ReqVerifyAuthCode{
-		Kind: ISmsService.ReqVerifyAuthCodeKind("").Enum().SignIn,
+		Kind: ISmsService.AuthCodeKind(nil).Enum().SignIn,
 		Mobile: req.Mobile,
 		AuthCode:req.Mobile,
 	}) ; if reject != nil {return }
-	user, reject := dep.userDS.CreateUser(IUserDataStorage.ReqCreateUser{
+	var user m.User
+	user, reject = dep.userDS.CreateUser(IUserDataStorage.ReqCreateUser{
 		Name: req.UserName,
 		Mobile: req.Mobile,
 		Password: req.Password,
