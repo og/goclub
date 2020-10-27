@@ -19,14 +19,14 @@ type User struct {
 	DeletedAt sql.NullTime `db:"deleted_at"`
 }
 func (User) Column()( c struct{
-	ID string
-	Name string
-	Mobile string
-	Password string
-	PasswordSalt string
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt string
+	ID f.Column
+	Name f.Column
+	Mobile f.Column
+	Password f.Column
+	PasswordSalt f.Column
+	CreatedAt f.Column
+	UpdatedAt f.Column
+	DeletedAt f.Column
 }) {
 	c.ID = "id"
 	c.Name = "name"
